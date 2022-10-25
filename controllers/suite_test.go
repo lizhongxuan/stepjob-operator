@@ -30,7 +30,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	stepiov1 "github.com/vega-punk/step-operator/api/v1"
+	stepiov1 "github.com/vega-punk/stepjob-operator/api/v1"
 	//+kubebuilder:scaffold:imports
 )
 

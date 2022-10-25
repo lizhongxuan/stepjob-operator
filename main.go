@@ -31,8 +31,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	stepiov1 "github.com/vega-punk/step-operator/api/v1"
-	"github.com/vega-punk/step-operator/controllers"
+	stepiov1 "github.com/vega-punk/stepjob-operator/api/v1"
+	"github.com/vega-punk/stepjob-operator/controllers"
 	//+kubebuilder:scaffold:imports
 )
 

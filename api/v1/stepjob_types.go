@@ -18,6 +18,16 @@ package v1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"time"
+)
+
+type StepCondition string
+
+const (
+	PendingStepCondition StepCondition = "Pending"
+	RunningStepCondition StepCondition = "Running"
+	SuccessStepCondition StepCondition = "Success"
+	FailedStepCondition  StepCondition = "Failed"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -25,26 +35,31 @@ import (
 
 // StepJobSpec defines the desired state of StepJob
 type StepJobSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-	Name string `json:"name,omitempty"`
-	Steps       []Step `json:"steps,omitempty"`
-	CurrentStep string `json:"current_step"`
+	Steps    []Step `json:"steps,omitempty"`
+	NodeName string `json:"node_name"`
+	Times    int    `json:"times"`
 }
 
 type Step struct {
-	Image           string `json:"image"`
-	StepName        string `json:"step_name"`
-	RetriesCount    int    `json:"retries_count"`
-	RetriesInterval int    `json:"retries_interval"`
-	CMD             string `json:"cmd"`
-	HTTP            string `json:"http"`
+	Image           string `json:"image,omitempty"`
+	StepName        string `json:"step_name,omitempty"`
+	RetriesCount    int    `json:"retries_count,omitempty"`
+	RetriesInterval int    `json:"retries_interval,omitempty"`
+	CMD             []string `json:"cmd,omitempty"`
+	HTTP            string `json:"http,omitempty"`
 }
 
 // StepJobStatus defines the observed state of StepJob
 type StepJobStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	CurrentStep string        `json:"current_step,omitempty"`
+	Condition   StepCondition `json:"condition,omitempty"`
+	Steps       map[string]StepStatus
+	EndTime     time.Time `json:"end_time"`
+}
+type StepStatus struct {
+	BeginTime time.Time     `json:"begin_time"`
+	EndTime   time.Time     `json:"end_time"`
+	Condition StepCondition `json:"condition"`
 }
 
 //+kubebuilder:object:root=true
