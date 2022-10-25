@@ -1,0 +1,34 @@
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - step.io.vega-punk.io
+  resources:
+  - stepjobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - step.io.vega-punk.io
+  resources:
+  - stepjobs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - step.io.vega-punk.io
+  resources:
+  - stepjobs/status
+  verbs:
+  - get
+  - patch
+  - update

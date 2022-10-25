@@ -1,0 +1,7 @@
+apiVersion: step.io.vega-punk.io/v1
+kind: StepJob
+metadata:
+  name: stepjob-sample
+spec:
+  # Add fields here
+  foo: bar

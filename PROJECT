@@ -1,0 +1,16 @@
+domain: vega-punk.io
+layout:
+- go.kubebuilder.io/v3
+projectName: step-operator
+repo: github.com/vega-punk/step-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: vega-punk.io
+  group: step.io
+  kind: StepJob
+  path: github.com/vega-punk/step-operator/api/v1
+  version: v1
+version: "3"

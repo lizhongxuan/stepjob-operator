@@ -1,0 +1,20 @@
+# permissions for end users to view stepjobs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: stepjob-viewer-role
+rules:
+- apiGroups:
+  - step.io.vega-punk.io
+  resources:
+  - stepjobs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - step.io.vega-punk.io
+  resources:
+  - stepjobs/status
+  verbs:
+  - get

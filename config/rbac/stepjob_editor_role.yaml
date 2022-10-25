@@ -1,0 +1,24 @@
+# permissions for end users to edit stepjobs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: stepjob-editor-role
+rules:
+- apiGroups:
+  - step.io.vega-punk.io
+  resources:
+  - stepjobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - step.io.vega-punk.io
+  resources:
+  - stepjobs/status
+  verbs:
+  - get
