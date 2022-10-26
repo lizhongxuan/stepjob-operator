@@ -36,17 +36,15 @@ spec:
           spec:
             description: StepJobSpec defines the desired state of StepJob
             properties:
-              current_step:
-                type: string
-              name:
-                description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-                  Important: Run "make" to regenerate code after modifying this file'
+              node_name:
                 type: string
               steps:
                 items:
                   properties:
                     cmd:
-                      type: string
+                      items:
+                        type: string
+                      type: array
                     http:
                       type: string
                     image:
@@ -58,19 +56,40 @@ spec:
                     step_name:
                       type: string
                   required:
-                  - cmd
-                  - http
-                  - image
-                  - retries_count
-                  - retries_interval
                   - step_name
                   type: object
                 type: array
+              times:
+                type: integer
             required:
-            - current_step
+            - node_name
+            - times
             type: object
           status:
             description: StepJobStatus defines the observed state of StepJob
+            properties:
+              condition:
+                type: string
+              current_step:
+                type: string
+              end_time:
+                format: date-time
+                type: string
+              steps:
+                additionalProperties:
+                  properties:
+                    begin_time:
+                      format: date-time
+                      type: string
+                    condition:
+                      type: string
+                    end_time:
+                      format: date-time
+                      type: string
+                  type: object
+                type: object
+            required:
+            - steps
             type: object
         type: object
     served: true

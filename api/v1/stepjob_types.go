@@ -18,7 +18,6 @@ package v1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"time"
 )
 
 type StepCondition string
@@ -53,15 +52,15 @@ type Step struct {
 
 // StepJobStatus defines the observed state of StepJob
 type StepJobStatus struct {
-	CurrentStep string        `json:"current_step,omitempty"`
-	Condition   StepCondition `json:"condition,omitempty"`
-	Steps       map[string]StepStatus
-	EndTime     time.Time `json:"end_time"`
+	CurrentStep string                `json:"current_step,omitempty"`
+	Condition   StepCondition         `json:"condition,omitempty"`
+	Steps       map[string]StepStatus `json:"steps"`
+	EndTime     metav1.Time          `json:"end_time,omitempty"`
 }
 type StepStatus struct {
-	BeginTime time.Time     `json:"begin_time"`
-	EndTime   time.Time     `json:"end_time"`
-	Condition StepCondition `json:"condition"`
+	BeginTime metav1.Time  `json:"begin_time,omitempty"`
+	EndTime   metav1.Time  `json:"end_time,omitempty"`
+	Condition StepCondition `json:"condition,omitempty"`
 }
 
 //+kubebuilder:object:root=true

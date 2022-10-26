@@ -22,6 +22,7 @@ import (
 	v1 "k8s.io/api/batch/v1"
 	v13 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"time"
 
@@ -84,7 +85,6 @@ func (r *StepJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	// 执行job
-	beginTime := time.Now()
 	condition, err := r.EnsureSJob(ctx, req.NamespacedName, currentStep, currentStepIndex, release.GetOwnerReferences(), release.Spec.NodeName, len(release.Spec.Steps))
 	if err != nil {
 		logger.Error(err, "EnsureSJob")
@@ -95,15 +95,19 @@ func (r *StepJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	stepStauts, ok := release.Status.Steps[release.Status.CurrentStep]
 	if !ok {
 		stepStauts = stepiov1.StepStatus{
-			BeginTime: beginTime,
+			BeginTime: metav1.Now(),
 		}
 	}
 	stepStauts.Condition = condition
 	release.Status.Steps[release.Status.CurrentStep] = stepStauts
 	if condition == stepiov1.NextStepCondition && len(release.Spec.Steps) > currentStepIndex+1 {
+		stepStauts.EndTime =  metav1.Now()
 		release.Status.CurrentStep = release.Spec.Steps[currentStepIndex+1].StepName
+	}else if condition == stepiov1.SuccessStepCondition || condition == stepiov1.FailedStepCondition {
+		stepStauts.EndTime =  metav1.Now()
+		release.Status.EndTime = metav1.Now()
 	}
-	if err := r.UpdateStatus(ctx, release); err != nil {
+	if err := r.Status().Update(ctx, &release); err != nil {
 		logger.Error(err, "UpdateStatus")
 		return ctrl.Result{}, err
 	}
@@ -118,16 +122,6 @@ func (r *StepJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 	logger.Info("End stepjob reconcile")
 	return ctrl.Result{}, nil
-}
-
-func (r *StepJobReconciler) UpdateStatus(ctx context.Context, release stepiov1.StepJob) error {
-	if release.Status.Condition == stepiov1.SuccessStepCondition || release.Status.Condition == stepiov1.FailedStepCondition {
-		release.Status.EndTime = time.Now()
-	}
-	if err := r.Status().Update(ctx, &release); err != nil {
-		return err
-	}
-	return nil
 }
 
 func generatedJob(ns, name string, OwnerRefs []v12.OwnerReference, podTemplateSpec v13.PodTemplateSpec) v1.Job {
