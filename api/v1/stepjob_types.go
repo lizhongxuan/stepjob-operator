@@ -28,6 +28,8 @@ const (
 	RunningStepCondition StepCondition = "Running"
 	SuccessStepCondition StepCondition = "Success"
 	FailedStepCondition  StepCondition = "Failed"
+	NextStepCondition    StepCondition = "Next"
+	NoneStepCondition    StepCondition = "None"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -41,12 +43,12 @@ type StepJobSpec struct {
 }
 
 type Step struct {
-	Image           string `json:"image,omitempty"`
-	StepName        string `json:"step_name,omitempty"`
-	RetriesCount    int    `json:"retries_count,omitempty"`
-	RetriesInterval int    `json:"retries_interval,omitempty"`
+	Image           string   `json:"image,omitempty"`
+	StepName        string   `json:"step_name"`
+	RetriesCount    int      `json:"retries_count,omitempty"`
+	RetriesInterval int      `json:"retries_interval,omitempty"`
 	CMD             []string `json:"cmd,omitempty"`
-	HTTP            string `json:"http,omitempty"`
+	HTTP            string   `json:"http,omitempty"`
 }
 
 // StepJobStatus defines the observed state of StepJob

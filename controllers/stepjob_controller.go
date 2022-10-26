@@ -23,7 +23,6 @@ import (
 	v13 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -84,104 +83,43 @@ func (r *StepJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, err
 	}
 
-	stepStatus, ok := release.Status.Steps[release.Status.CurrentStep]
+	// 执行job
+	condition, err := r.EnsureSJob(ctx, req.NamespacedName, currentStep, currentStepIndex, release.GetOwnerReferences(), release.Spec.NodeName, len(release.Spec.Steps))
+	if err != nil {
+		logger.Error(err, "EnsureSJob")
+		return ctrl.Result{}, err
+	}
+
+	// 更新状态
+	stepStauts, ok := release.Status.Steps[release.Status.CurrentStep]
 	if !ok {
-		stepStatus = stepiov1.StepStatus{
+		stepStauts = stepiov1.StepStatus{
 			BeginTime: time.Now(),
-			Condition: stepiov1.RunningStepCondition,
 		}
 	}
-
-	sjob := v1.Job{}
-	skey := types.NamespacedName{
-		Name:      getJobName(release.Name, currentStepIndex),
-		Namespace: release.Namespace,
+	stepStauts.Condition = condition
+	release.Status.Steps[release.Status.CurrentStep] = stepStauts
+	if condition == stepiov1.NextStepCondition && len(release.Spec.Steps) > currentStepIndex+1 {
+		release.Status.CurrentStep = release.Spec.Steps[currentStepIndex+1].StepName
 	}
-	if err := r.Get(ctx, skey, &sjob); err != nil {
-		if apierrors.IsNotFound(err) {
-			// 创建job
-			newJob := generatedJob(skey.Name, skey.Namespace, release.GetOwnerReferences(), v13.PodTemplateSpec{
-				Spec: v13.PodSpec{
-					Containers: []v13.Container{
-						{
-							Name:    currentStep.StepName,
-							Image:   currentStep.Image,
-							Command: currentStep.CMD,
-						},
-					},
-					NodeName: release.Spec.NodeName,
-				},
-			})
-			if err := r.Create(ctx, &newJob); err != nil {
-				logger.Error(err, "Create job")
-				return ctrl.Result{}, err
-			}
-			release.Status.Steps[release.Status.CurrentStep] = stepStatus
-			if err := r.UpdateStatus(ctx, release, stepiov1.RunningStepCondition); err != nil {
-				logger.Error(err, "Status Update")
-				return ctrl.Result{}, err
-			}
-			return ctrl.Result{
-				RequeueAfter: 5 * time.Second,
-			}, nil
-		}
-		logger.Error(err, "Get job")
+	if err := r.UpdateStatus(ctx, release); err != nil {
+		logger.Error(err, "UpdateStatus")
 		return ctrl.Result{}, err
 	}
-	// 获取当前step的job
-	if sjob.Status.CompletionTime == nil {
-		// 当前job还在运行,继续等待
-		return ctrl.Result{
-			RequeueAfter: 5 * time.Second,
-		}, nil
-	} else if sjob.Status.Succeeded == 0 {
-		// job失败
-		// stop step
-		stepStatus.Condition = stepiov1.FailedStepCondition
-		release.Status.Steps[release.Status.CurrentStep] = stepStatus
-		if err := r.UpdateStatus(ctx, release, stepiov1.FailedStepCondition); err != nil {
-			logger.Error(err, "Status Update")
-			return ctrl.Result{}, err
-		}
-		logger.Info("End all step reconcile")
-		return ctrl.Result{}, nil
-	}
 
-	// job成功
-	if currentStepIndex+1 == len(release.Spec.Steps) {
-		// end all step
-		stepStatus.EndTime = time.Now()
-		stepStatus.Condition = stepiov1.SuccessStepCondition
-		release.Status.Steps[currentStep.StepName] = stepStatus
-		if err := r.UpdateStatus(ctx, release, stepiov1.SuccessStepCondition); err != nil {
-			logger.Error(err, "Status Update")
-			return ctrl.Result{}, err
-		}
-		logger.Info("End all step reconcile")
-		return ctrl.Result{}, nil
+	// 回调
+	if condition == stepiov1.RunningStepCondition || condition == stepiov1.PendingStepCondition {
+		return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
+	} else if condition == stepiov1.NextStepCondition {
+		return ctrl.Result{Requeue: true}, nil
 	}
-
-	// next step
-	stepStatus.EndTime = time.Now()
-	stepStatus.Condition = stepiov1.SuccessStepCondition
-	step := release.Spec.Steps[currentStepIndex+1]
-	release.Status.CurrentStep = step.StepName
-	release.Status.Steps[currentStep.StepName] = stepStatus
-	if err := r.UpdateStatus(ctx, release, stepiov1.RunningStepCondition); err != nil {
-		logger.Error(err, "Status Update")
-		return ctrl.Result{}, err
-	}
-	logger.Info("Next step reconcile")
-	return ctrl.Result{
-		Requeue: true,
-	}, nil
+	return ctrl.Result{}, nil
 }
 
-func (r *StepJobReconciler) UpdateStatus(ctx context.Context, release stepiov1.StepJob, condition stepiov1.StepCondition) error {
-	if condition == stepiov1.SuccessStepCondition {
+func (r *StepJobReconciler) UpdateStatus(ctx context.Context, release stepiov1.StepJob) error {
+	if release.Status.Condition == stepiov1.SuccessStepCondition || release.Status.Condition == stepiov1.FailedStepCondition {
 		release.Status.EndTime = time.Now()
 	}
-	release.Status.Condition = condition
 	if err := r.Status().Update(ctx, &release); err != nil {
 		return err
 	}
@@ -205,12 +143,12 @@ func getJobName(releaseName string, stepIndex int) string {
 	return fmt.Sprintf("%s-step-%d", releaseName, stepIndex)
 }
 
-func getCurrentStep(currentStep string, steps []stepiov1.Step) (*stepiov1.Step, int, error) {
-	if currentStep == "" {
+func getCurrentStep(currentStepName string, steps []stepiov1.Step) (*stepiov1.Step, int, error) {
+	if currentStepName == "" {
 		return &steps[0], 0, nil
 	}
 	for i, s := range steps {
-		if s.StepName == currentStep {
+		if s.StepName == currentStepName {
 			return &steps[i], i, nil
 		}
 	}
