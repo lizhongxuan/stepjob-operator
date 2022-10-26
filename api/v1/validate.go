@@ -9,6 +9,11 @@ func (s *StepJob) Validate() error {
 	if len(s.Spec.Steps) == 0 {
 		return errors.New("steps is nil")
 	}
+	for i,_ := range s.Spec.Steps{
+		if s.Spec.Steps[i].Image == "" {
+			s.Spec.Steps[i].Image = "busybox:latest"
+		}
+	}
 	return nil
 }
 
