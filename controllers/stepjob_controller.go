@@ -84,6 +84,7 @@ func (r *StepJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	// 执行job
+	beginTime := time.Now()
 	condition, err := r.EnsureSJob(ctx, req.NamespacedName, currentStep, currentStepIndex, release.GetOwnerReferences(), release.Spec.NodeName, len(release.Spec.Steps))
 	if err != nil {
 		logger.Error(err, "EnsureSJob")
@@ -94,7 +95,7 @@ func (r *StepJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	stepStauts, ok := release.Status.Steps[release.Status.CurrentStep]
 	if !ok {
 		stepStauts = stepiov1.StepStatus{
-			BeginTime: time.Now(),
+			BeginTime: beginTime,
 		}
 	}
 	stepStauts.Condition = condition
