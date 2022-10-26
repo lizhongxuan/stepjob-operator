@@ -109,10 +109,13 @@ func (r *StepJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	// 回调
 	if condition == stepiov1.RunningStepCondition || condition == stepiov1.PendingStepCondition {
+		logger.Info("Wait stepjob reconcile")
 		return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
 	} else if condition == stepiov1.NextStepCondition {
+		logger.Info("Next stepjob reconcile")
 		return ctrl.Result{Requeue: true}, nil
 	}
+	logger.Info("End stepjob reconcile")
 	return ctrl.Result{}, nil
 }
 
