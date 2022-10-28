@@ -30,6 +30,7 @@ spec:
         args:
         - --leader-elect
         image: stepjob-operator:latest
+        imagePullPolicy: IfNotPresent
         name: manager
         securityContext:
           allowPrivilegeEscalation: false
