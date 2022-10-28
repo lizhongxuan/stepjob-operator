@@ -22,7 +22,9 @@ func (s *StepJob) Validate() error {
 		if s.Spec.Steps[i].RetriesInterval == 0 {
 			s.Spec.Steps[i].RetriesCount = 5
 		}
-
+	}
+	if s.Status.Steps == nil {
+		s.Status.Steps = make(map[string]StepStatus)
 	}
 	return nil
 }
