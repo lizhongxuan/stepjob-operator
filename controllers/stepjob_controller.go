@@ -22,7 +22,6 @@ import (
 	v1 "k8s.io/api/batch/v1"
 	v13 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"time"
 
@@ -95,17 +94,17 @@ func (r *StepJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	stepStauts, ok := release.Status.Steps[release.Status.CurrentStep]
 	if !ok {
 		stepStauts = stepiov1.StepStatus{
-			BeginTime: metav1.Now(),
+			BeginTime: time.Now().Unix(),
 		}
 	}
 	stepStauts.Condition = condition
 	release.Status.Steps[release.Status.CurrentStep] = stepStauts
 	if condition == stepiov1.NextStepCondition && len(release.Spec.Steps) > currentStepIndex+1 {
-		stepStauts.EndTime =  metav1.Now()
+		stepStauts.EndTime = time.Now().Unix()
 		release.Status.CurrentStep = release.Spec.Steps[currentStepIndex+1].StepName
-	}else if condition == stepiov1.SuccessStepCondition || condition == stepiov1.FailedStepCondition {
-		stepStauts.EndTime =  metav1.Now()
-		release.Status.EndTime = metav1.Now()
+	} else if condition == stepiov1.SuccessStepCondition || condition == stepiov1.FailedStepCondition {
+		stepStauts.EndTime = time.Now().Unix()
+		release.Status.EndTime = time.Now().Unix()
 	}
 	if err := r.Status().Update(ctx, &release); err != nil {
 		logger.Error(err, "UpdateStatus")
@@ -138,7 +137,7 @@ func generatedJob(ns, name string, OwnerRefs []v12.OwnerReference, podTemplateSp
 			Parallelism:  &parallelism,
 			Completions:  &completions,
 			BackoffLimit: &backoffLimit,
-			Template: podTemplateSpec,
+			Template:     podTemplateSpec,
 		},
 	}
 }

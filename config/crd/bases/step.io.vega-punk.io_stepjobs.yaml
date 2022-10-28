@@ -73,19 +73,19 @@ spec:
               current_step:
                 type: string
               end_time:
-                format: date-time
-                type: string
+                format: int64
+                type: integer
               steps:
                 additionalProperties:
                   properties:
                     begin_time:
-                      format: date-time
-                      type: string
+                      format: int64
+                      type: integer
                     condition:
                       type: string
                     end_time:
-                      format: date-time
-                      type: string
+                      format: int64
+                      type: integer
                   type: object
                 type: object
             required:

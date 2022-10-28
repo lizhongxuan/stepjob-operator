@@ -55,11 +55,11 @@ type StepJobStatus struct {
 	CurrentStep string                `json:"current_step,omitempty"`
 	Condition   StepCondition         `json:"condition,omitempty"`
 	Steps       map[string]StepStatus `json:"steps"`
-	EndTime     metav1.Time          `json:"end_time,omitempty"`
+	EndTime     int64                 `json:"end_time,omitempty"`
 }
 type StepStatus struct {
-	BeginTime metav1.Time  `json:"begin_time,omitempty"`
-	EndTime   metav1.Time  `json:"end_time,omitempty"`
+	BeginTime int64         `json:"begin_time,omitempty"`
+	EndTime   int64         `json:"end_time,omitempty"`
 	Condition StepCondition `json:"condition,omitempty"`
 }
 
