@@ -9,10 +9,20 @@ func (s *StepJob) Validate() error {
 	if len(s.Spec.Steps) == 0 {
 		return errors.New("steps is nil")
 	}
+	if s.Spec.Times == 0 {
+		s.Spec.Times = 1
+	}
 	for i,_ := range s.Spec.Steps{
 		if s.Spec.Steps[i].Image == "" {
 			s.Spec.Steps[i].Image = "busybox:latest"
 		}
+		if s.Spec.Steps[i].RetriesCount == 0 {
+			s.Spec.Steps[i].RetriesCount = 1
+		}
+		if s.Spec.Steps[i].RetriesInterval == 0 {
+			s.Spec.Steps[i].RetriesCount = 5
+		}
+
 	}
 	return nil
 }

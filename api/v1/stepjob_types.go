@@ -36,9 +36,9 @@ const (
 
 // StepJobSpec defines the desired state of StepJob
 type StepJobSpec struct {
-	Steps    []Step `json:"steps,omitempty"`
-	NodeName string `json:"node_name"`
-	Times    int    `json:"times"`
+	Steps    []Step `json:"steps"`
+	NodeName string `json:"node_name,omitempty"`
+	Times    int    `json:"times,omitempty"`
 }
 
 type Step struct {
@@ -46,7 +46,7 @@ type Step struct {
 	StepName        string   `json:"step_name"`
 	RetriesCount    int      `json:"retries_count,omitempty"`
 	RetriesInterval int      `json:"retries_interval,omitempty"`
-	CMD             []string `json:"cmd,omitempty"`
+	CMD             []string `json:"cmd"`
 	HTTP            string   `json:"http,omitempty"`
 }
 

@@ -56,14 +56,14 @@ spec:
                     step_name:
                       type: string
                   required:
+                  - cmd
                   - step_name
                   type: object
                 type: array
               times:
                 type: integer
             required:
-            - node_name
-            - times
+            - steps
             type: object
           status:
             description: StepJobStatus defines the observed state of StepJob
