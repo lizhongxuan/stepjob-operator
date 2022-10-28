@@ -4,5 +4,15 @@ metadata:
   name: stepjob-sample
   namespace: system
 spec:
-  # Add fields here
-  steps: bar
+  times: 1
+  node_name: lizhongxuan-60
+  steps:
+    - step_name: step111
+      cmd:
+        - echo "step111"
+    - step_name: step222
+        cmd:
+          - echo "step222"
+    - step_name: step333
+        cmd:
+          - echo "step333"
