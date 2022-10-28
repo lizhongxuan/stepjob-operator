@@ -28,6 +28,7 @@ func (r *StepJobReconciler) EnsureSJob(ctx context.Context, nsname types.Namespa
 		// 创建job
 		newJob := generatedJob(skey.Namespace, skey.Name, OwnerRefs, v13.PodTemplateSpec{
 			Spec: v13.PodSpec{
+				RestartPolicy: v13.RestartPolicyNever,
 				Containers: []v13.Container{
 					{
 						Name:    currentStep.StepName,
