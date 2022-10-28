@@ -29,8 +29,7 @@ spec:
         - /manager
         args:
         - --leader-elect
-        image: stepjob-operator:latest
-        imagePullPolicy: IfNotPresent
+        image: kcr.kingdee.com/gpaas/stepjob-operator:v1.1
         name: manager
         securityContext:
           allowPrivilegeEscalation: false
