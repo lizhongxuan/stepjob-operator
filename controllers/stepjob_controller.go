@@ -85,7 +85,16 @@ func (r *StepJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	release.Status.CurrentStep = currentStep.StepName
 
 	// 执行job
-	condition, err := r.EnsureSJob(ctx, req.NamespacedName, currentStep, currentStepIndex, release.GetOwnerReferences(), release.Spec.NodeName, len(release.Spec.Steps))
+	trueVar := true
+	condition, err := r.EnsureSJob(ctx, req.NamespacedName, currentStep, currentStepIndex, []v12.OwnerReference{
+		{
+			APIVersion: release.APIVersion,
+			Kind:       release.Kind,
+			Name:       release.Name,
+			Controller: &trueVar,
+			UID:        release.UID,
+		},
+	}, release.Spec.NodeName, len(release.Spec.Steps))
 	if err != nil {
 		logger.Error(err, "EnsureSJob")
 		return ctrl.Result{}, err
