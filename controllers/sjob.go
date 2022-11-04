@@ -33,7 +33,7 @@ func (r *StepJobReconciler) EnsureSJob(ctx context.Context, nsname types.Namespa
 					{
 						Name:    currentStep.StepName,
 						Image:   currentStep.Image,
-						Command: currentStep.CMD,
+						Command: append([]string{"sh","-c"},currentStep.CMD...),
 					},
 				},
 				NodeName: nodeName,
