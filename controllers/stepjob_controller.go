@@ -126,7 +126,7 @@ func (r *StepJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 func generatedJob(ns, name string, OwnerRefs []v12.OwnerReference, podTemplateSpec v13.PodTemplateSpec) v1.Job {
 	var parallelism int32 = 1
 	var completions int32 = 1
-	var backoffLimit int32 = 0
+	var backoffLimit int32 = 1
 	return v1.Job{
 		ObjectMeta: ctrl.ObjectMeta{
 			Name:            name,
