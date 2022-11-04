@@ -7,26 +7,26 @@ spec:
   times: 1
   node_name: lizhongxuan-60
   steps:
-    - step_name: "1.create mysql"
+    - step_name: 1_create_mysql
       cmd:
         - echo "begin create mysql"
         - echo "begin create mysql22222"
-    - step_name: "2.insert data"
+    - step_name: 2_insert_data
       init_cmd:
         - echo "wait mysql backup complete"
       cmd:
         - echo "insert data"
-    - step_name: "3.myql recovery"
+    - step_name: 3_myql_recovery
       init_cmd:
         - echo "wait mysql backup complete"
       cmd:
         - echo "begin myql recovery"
-    - step_name: "4.craete new mysql"
+    - step_name: 4_craete_new_mysql
       init_cmd:
         - echo "wait mysql recovery complete"
       cmd:
         - echo "craete new mysql"
-    - step_name: "5.correlation data"
+    - step_name: 5_correlation_data
       init_cmd:
         - echo "wait new mysql craete complete"
       cmd:
