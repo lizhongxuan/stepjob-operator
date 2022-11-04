@@ -25,9 +25,20 @@ func (r *StepJobReconciler) EnsureSJob(ctx context.Context, nsname types.Namespa
 			return stepiov1.NoneStepCondition, err
 		}
 
+		initContainers := []v13.Container{}
+		if len(currentStep.InitCMD) != 0 {
+			initContainers = append(initContainers,v13.Container{
+					Name:    currentStep.StepName+"-init",
+					Image:   currentStep.Image,
+					Command: append([]string{"sh","-c"},currentStep.InitCMD...),
+			})
+		}
+
+
 		// 创建job
 		newJob := generatedJob(skey.Namespace, skey.Name, OwnerRefs, v13.PodTemplateSpec{
 			Spec: v13.PodSpec{
+				InitContainers: initContainers,
 				RestartPolicy: v13.RestartPolicyNever,
 				Containers: []v13.Container{
 					{

@@ -46,6 +46,7 @@ type Step struct {
 	StepName        string   `json:"step_name"`
 	RetriesCount    int      `json:"retries_count,omitempty"`
 	RetriesInterval int      `json:"retries_interval,omitempty"`
+	InitCMD         []string `json:"init_cmd"`
 	CMD             []string `json:"cmd"`
 	HTTP            string   `json:"http,omitempty"`
 }
@@ -55,11 +56,11 @@ type StepJobStatus struct {
 	CurrentStep string                `json:"current_step,omitempty"`
 	Condition   StepCondition         `json:"condition,omitempty"`
 	Steps       map[string]StepStatus `json:"steps"`
-	EndTime     string                 `json:"end_time,omitempty"`
+	EndTime     string                `json:"end_time,omitempty"`
 }
 type StepStatus struct {
-	BeginTime string         `json:"begin_time,omitempty"`
-	EndTime   string         `json:"end_time,omitempty"`
+	BeginTime string        `json:"begin_time,omitempty"`
+	EndTime   string        `json:"end_time,omitempty"`
 	Condition StepCondition `json:"condition,omitempty"`
 }
 

@@ -1,0 +1,33 @@
+apiVersion: step.io.vega-punk.io/v1
+kind: StepJob
+metadata:
+  name: mysql-test
+  namespace: system
+spec:
+  times: 1
+  node_name: lizhongxuan-60
+  steps:
+    - step_name: "1.create mysql"
+      cmd:
+        - echo "begin create mysql"
+        - echo "begin create mysql22222"
+    - step_name: "2.insert data"
+      init_cmd:
+        - echo "wait mysql backup complete"
+      cmd:
+        - echo "insert data"
+    - step_name: "3.myql recovery"
+      init_cmd:
+        - echo "wait mysql backup complete"
+      cmd:
+        - echo "begin myql recovery"
+    - step_name: "4.craete new mysql"
+      init_cmd:
+        - echo "wait mysql recovery complete"
+      cmd:
+        - echo "craete new mysql"
+    - step_name: "5.correlation data"
+      init_cmd:
+        - echo "wait new mysql craete complete"
+      cmd:
+        - echo "correlation data"
