@@ -61,7 +61,6 @@ spec:
                       type: string
                   required:
                   - cmd
-                  - init_cmd
                   - step_name
                   type: object
                 type: array

@@ -46,7 +46,7 @@ type Step struct {
 	StepName        string   `json:"step_name"`
 	RetriesCount    int      `json:"retries_count,omitempty"`
 	RetriesInterval int      `json:"retries_interval,omitempty"`
-	InitCMD         []string `json:"init_cmd"`
+	InitCMD         []string `json:"init_cmd,omitempty"`
 	CMD             []string `json:"cmd"`
 	HTTP            string   `json:"http,omitempty"`
 }
