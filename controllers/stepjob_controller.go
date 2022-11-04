@@ -82,6 +82,7 @@ func (r *StepJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		logger.Error(err, "getCurrentStep")
 		return ctrl.Result{}, err
 	}
+	release.Status.CurrentStep = currentStep.StepName
 
 	// 执行job
 	condition, err := r.EnsureSJob(ctx, req.NamespacedName, currentStep, currentStepIndex, release.GetOwnerReferences(), release.Spec.NodeName, len(release.Spec.Steps))
@@ -94,17 +95,17 @@ func (r *StepJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	stepStauts, ok := release.Status.Steps[release.Status.CurrentStep]
 	if !ok {
 		stepStauts = stepiov1.StepStatus{
-			BeginTime: time.Now().Unix(),
+			BeginTime: time.Now().String(),
 		}
 	}
 	stepStauts.Condition = condition
 	release.Status.Steps[release.Status.CurrentStep] = stepStauts
 	if condition == stepiov1.NextStepCondition && len(release.Spec.Steps) > currentStepIndex+1 {
-		stepStauts.EndTime = time.Now().Unix()
+		stepStauts.EndTime = time.Now().String()
 		release.Status.CurrentStep = release.Spec.Steps[currentStepIndex+1].StepName
 	} else if condition == stepiov1.SuccessStepCondition || condition == stepiov1.FailedStepCondition {
-		stepStauts.EndTime = time.Now().Unix()
-		release.Status.EndTime = time.Now().Unix()
+		stepStauts.EndTime = time.Now().String()
+		release.Status.EndTime = time.Now().String()
 	}
 	if err := r.Status().Update(ctx, &release); err != nil {
 		logger.Error(err, "UpdateStatus")
