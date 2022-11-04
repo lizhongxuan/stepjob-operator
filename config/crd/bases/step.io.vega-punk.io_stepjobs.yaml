@@ -49,6 +49,10 @@ spec:
                       type: string
                     image:
                       type: string
+                    init_cmd:
+                      items:
+                        type: string
+                      type: array
                     retries_count:
                       type: integer
                     retries_interval:
@@ -57,6 +61,7 @@ spec:
                       type: string
                   required:
                   - cmd
+                  - init_cmd
                   - step_name
                   type: object
                 type: array
@@ -73,19 +78,16 @@ spec:
               current_step:
                 type: string
               end_time:
-                format: int64
-                type: integer
+                type: string
               steps:
                 additionalProperties:
                   properties:
                     begin_time:
-                      format: int64
-                      type: integer
+                      type: string
                     condition:
                       type: string
                     end_time:
-                      format: int64
-                      type: integer
+                      type: string
                   type: object
                 type: object
             required:
